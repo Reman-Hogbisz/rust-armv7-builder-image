@@ -22,12 +22,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Login to Hogbisz Container Registry
-        uses: docker/login-action@v2
+      # - name: Login to Hogbisz Container Registry
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: http://registry.hogbisz.com
+      #     username: github
+      #     password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          registry: http://registry.hogbisz.com
-          username: github
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          username: ${{ secrets.RH_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.RH_DOCKERHUB_TOKEN }}
       - name: Build for armv7 and push-
         uses: docker/build-push-action@v2
         with:
@@ -36,5 +41,6 @@ jobs:
           platforms: linux/armv7
           push: true
           tags: |
-            registry.hogbisz.com/rust-armv7-builder:latest
+            # registry.hogbisz.com/rust-armv7-builder:latest
             ghcr.io/reman-hogbisz/rust-armv7-builder:latest
+            remanhogbisz/rust-armv7-builder:latest
