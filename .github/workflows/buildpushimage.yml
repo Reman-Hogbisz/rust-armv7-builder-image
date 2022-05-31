@@ -37,4 +37,4 @@ jobs:
           push: true
           tags: |
             registry.hogbisz.com/rust-armv7-builder:latest
-            ghcr.io/Reman-Hogbisz/rust-armv7-builder:latest
+            ghcr.io/reman-hogbisz/rust-armv7-builder:latest
