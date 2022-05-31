@@ -41,6 +41,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            # registry.hogbisz.com/rust-armv7-builder:test
             ghcr.io/reman-hogbisz/rust-armv7-builder:test
             remanhogbisz/rust-armv7-builder:test
