@@ -1,0 +1,3 @@
+FROM hello-world
+
+RUN mkdir /test
