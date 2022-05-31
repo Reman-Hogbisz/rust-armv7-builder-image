@@ -19,10 +19,10 @@ RUN apt update -y && apt install -y git \
     make
 
 # Get openssl and compile for armv7
-RUN git clone https://github.com/openssl/openssl.git /openssl
-ENV OSSL_INSTALL_DIR=/openssl/out
+RUN git clone https://github.com/openssl/openssl.git /openssl_src
+ENV OSSL_INSTALL_DIR=/openssl
 
-WORKDIR /openssl
+WORKDIR /openssl_src
 
 RUN ./Configure linux-generic32 shared \
     --prefix=$OSSL_INSTALL_DIR --openssldir=$OSSL_INSTALL_DIR/openssl \
@@ -32,22 +32,26 @@ RUN make depend
 RUN make
 RUN make install
 
+WORKDIR /app
+
+RUN rm -rf /openssl_src
+
 # Get psql-dev and compile for armv7
-RUN git clone https://github.com/postgres/postgres.git /postgres
-ENV PQ_INSTALL_DIR=/postgres/out
+RUN git clone https://github.com/postgres/postgres.git /postgres_src
+ENV PQ_INSTALL_DIR=/postgres
 
-WORKDIR /postgres
+WORKDIR /postgres_src
 
-RUN ./configure --prefix=$PQ_INSTALL_DIR --host=arm-linux CC=/usr/bin/arm-linux-gnueabihf-gcc AR=/usr/bin/arm-linux-gnueabihf-ar CPP=/usr/bin/arm-linux-gnueabihf-cpp --without-readline --without-zlib --disable-spinlocks
+RUN ./configure --prefix=$PQ_INSTALL_DIR --host=arm-linux CC=/usr/bin/arm-linux-gnueabihf-gcc AR=/usr/bin/arm-linux-gnueabihf-ar CPP=/usr/bin>
 
-WORKDIR /postgres/src/interfaces/libpq
+WORKDIR /postgres_src/src/interfaces/libpq
 
 RUN make
 RUN make install
 
-# Build app
-RUN rustup target add armv7-unknown-linux-gnueabihf
-RUN rustup toolchain install stable-armv7-unknown-linux-gnueabihf
+WORKDIR /app
+
+RUN rm -rf /postgres_src
 
 ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc \
     CC_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc \
@@ -56,3 +60,6 @@ ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc \
     OPENSSL_INCLUDE_DIR=$OSSL_INSTALL_DIR/include \
     PQ_LIB_DIR=$PQ_INSTALL_DIR/lib \
     PQ_INCLUDE_DIR=$PQ_INSTALL_DIR/include
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /usr/local/rustup/toolchains/stable-armv7-unknown-linux-gnueabihf
